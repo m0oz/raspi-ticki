@@ -62,23 +62,18 @@ git clone <repository-url>
 cd raspi-ticki
 ```
 
-1. Build the Docker image:
+1. Build and save the Docker image:
 
 ```bash
 docker buildx create --use
-docker buildx build --platform linux/arm/v7 -t raspi-radio --load .
-```
-
-1. Save the image:
-
-```bash
-docker save raspi-radio > raspi-radio.tar
+docker buildx build --platform linux/arm/v7 -t raspi-ticki --load .
+docker save raspi-ticki > raspi-ticki.tar
 ```
 
 1. Transfer the image to Raspberry Pi:
 
 ```bash
-scp raspi-radio.tar <username>@<raspberry-pi-ip>:~
+scp raspi-ticki.tar ticki:~
 ```
 
 1. On the Raspberry Pi, load and run the image:
@@ -86,22 +81,23 @@ scp raspi-radio.tar <username>@<raspberry-pi-ip>:~
 ```bash
 # SSH into your Pi
 ssh <username>@<raspberry-pi-ip>
-
-# Load the image
-docker load < raspi-radio.tar
+docker load < raspi-ticki.tar
 
 # Run the container
 docker run -d \
-  --name radio \
+  --name ticki \
   --restart unless-stopped \
-  -p 5000:5000 \
+  --dns 8.8.8.8 \
+  --dns 8.8.4.4 \
+  -p 8888:8888 \
   --device /dev/snd \
-  raspi-radio
+  --group-add audio \
+  raspi-ticki
 ```
 
 1. Access the web interface:
 
-<http://<raspberry-pi-ip:5000>
+<http://<raspberry-pi-ip:8888>
 
 ## Usage
 
@@ -121,6 +117,7 @@ To add more stations, modify the `current_station` dictionary in `app.py` with a
 ```bash
 # Add your user to the audio group
 sudo usermod -aG audio $USER
+sudo usermod -aG audio root
 ```
 
 1. If the container fails to start:
