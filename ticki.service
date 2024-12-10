@@ -1,0 +1,13 @@
+[Unit]
+Description=Ticki Radio App
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/ticki
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/pi/ticki/venv/bin/gunicorn -b 0.0.0.0:8888 --workers=1 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

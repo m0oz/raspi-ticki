@@ -1,7 +1,5 @@
-rsync -av --exclude 'venv/' \
-         --exclude '__pycache__/' \
-         --exclude '*.pyc' \
-         --exclude '.git/' \
-         --exclude '.env' \
-         --exclude '*.tar' \
+rsync -av --filter=":- .gitignore" \
+         --exclude=".git/" \
          ./ ticki:/home/pi/ticki/
+rsync -av ./mp3/ ticki:/home/pi/ticki/mp3/
+

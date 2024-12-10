@@ -1,4 +1,6 @@
-# Raspberry Pi Internet Radio
+# Ticki Radio Alarm
+
+<img src="static/ticki-wallpaper.webp" alt="Ticki Radio Interface" width="700">
 
 A web-based internet radio player for Raspberry Pi with alarm functionality.
 
@@ -7,13 +9,11 @@ A web-based internet radio player for Raspberry Pi with alarm functionality.
 - Web interface for controlling the radio
 - Play/Stop controls
 - Alarm functionality to start playing at a specific time
-- Currently supports SRF2 radio station
 
 ## Prerequisites
 
 - Raspberry Pi 3 Model A+
-- 32GB (minimum) microSD card
-- Docker installed on your development machine
+- 8GB (minimum) microSD card
 - Raspberry Pi Imager (for flashing the SD card)
 
 ## Setup Instructions
@@ -30,69 +30,35 @@ A web-based internet radio player for Raspberry Pi with alarm functionality.
      - Set a username and password
      - Configure your WiFi settings
    - Click "Write" and wait for the process to complete
-
 4. Insert the microSD card into your Raspberry Pi and power it on
 5. Find your Raspberry Pi's IP address (you can use your router's admin panel or `nmap -sn 192.168.1.0/24` on your network)
 
-### 2. Install Docker on Raspberry Pi
+### 2. Copy the repository to your Raspberry Pi
 
-SSH into your Raspberry Pi and run:
+1. Make sure you have SSH access to your Raspberry Pi
+
+1. Use the sync script to copy the repository to your Raspberry Pi:
 
 ```bash
-# SSH into your Pi
-ssh <username>@<raspberry-pi-ip>
-
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo usermod -aG docker $USER
-
-# Reboot the Pi
-sudo reboot
+./sync.sh
 ```
 
-### 3. Build and Deploy the Application
-
-On your development machine:
-
-1. Clone this repository:
+1. On your Raspberry Pi, setup the virtual environment and install the dependencies:
 
 ```bash
-git clone <repository-url>
-cd raspi-ticki
+cd ticki
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-1. Build and save the Docker image:
+1. Create a systemd service to run the application:
 
 ```bash
-docker buildx create --use
-docker buildx build --platform linux/arm/v7 -t raspi-ticki --load .
-docker save raspi-ticki > raspi-ticki.tar
-```
-
-1. Transfer the image to Raspberry Pi:
-
-```bash
-scp raspi-ticki.tar ticki:~
-```
-
-1. On the Raspberry Pi, load and run the image:
-
-```bash
-# SSH into your Pi
-ssh <username>@<raspberry-pi-ip>
-docker load < raspi-ticki.tar
-
-# Run the container
-docker run -d \
-  --name ticki \
-  --restart unless-stopped \
-  --dns 8.8.8.8 \
-  --dns 8.8.4.4 \
-  -p 8888:8888 \
-  --device /dev/snd \
-  --group-add audio \
-  raspi-ticki
+sudo cp ticki.service /etc/systemd/system/ticki.service
+sudo systemctl daemon-reload
+sudo systemctl enable ticki
+sudo systemctl start ticki
 ```
 
 1. Access the web interface:
@@ -110,7 +76,42 @@ Use the web interface to:
 
 To add more stations, modify the `current_station` dictionary in `app.py` with additional station URLs.
 
-## Troubleshooting
+## Optional: Deploy with Docker
+
+```bash
+./sync.sh
+```### 1. Build and Deploy the Application
+
+On your development machine:
+
+1. Build and save the Docker image:
+
+```bash
+docker buildx create --use
+docker buildx build --platform linux/arm/v7 -t raspi-ticki --load . && docker save raspi-ticki > raspi-ticki.tar
+scp raspi-ticki.tar ticki:~
+```
+
+1. On the Raspberry Pi, load and run the image:
+
+```bash
+sudo docker load < raspi-ticki.tar
+rm raspi-ticki.tar
+
+# Run the container
+docker run -d \
+  --name ticki \
+  --restart unless-stopped \
+  --dns 8.8.8.8 \
+  --dns 8.8.4.4 \
+  -p 8888:8888 \
+  --device /dev/snd \
+  --group-add audio \
+  raspi-ticki
+```
+
+
+### Troubleshooting
 
 1. If you get audio permission errors:
 
