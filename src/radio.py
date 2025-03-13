@@ -4,6 +4,7 @@ from pathlib import Path
 import requests
 import vlc
 from apscheduler.schedulers.background import BackgroundScheduler
+from .projector import Projector
 
 
 @dataclass
@@ -44,7 +45,31 @@ class Radio:
         self.alarm_jobs = [None, None]
         self.scheduler = BackgroundScheduler()
         self.scheduler.start()
+
+        # Initialize 7segment projector controller
+        # Pin assigment: MOSI 19, GND 10, CLOCK 23, CE 24
+        self.projector = Projector()
+
+        # Schedule projector updates every second if not already scheduled
+        if not self.scheduler.get_job("display_update"):
+            self.scheduler.add_job(
+                self._update_display,
+                "interval",
+                seconds=1,
+                id="display_update",
+            )
+
         self.init_player()
+
+    def _update_display(self):
+        """Update the display with current status."""
+        current_time = datetime.now()
+        self.projector.send_time(current_time.hour, current_time.minute)
+
+    def cleanup(self):
+        """Clean up resources when shutting down."""
+        if self.scheduler.running:
+            self.scheduler.shutdown()
 
     def get_stream_url(self):
         try:
@@ -95,7 +120,7 @@ class Radio:
                 self.scheduler.add_job(
                     self.stop_radio,
                     "date",
-                    run_date=datetime.now() + timedelta(minutes=10),
+                    run_date=datetime.now() + timedelta(seconds=10),
                     id="auto_stop",
                 )
                 return True
@@ -136,13 +161,20 @@ class Radio:
 
             if self.alarms[alarm_index].enabled and self.alarms[alarm_index].time:
                 print(f"Adding new job for alarm {alarm_index}")
-                self.alarm_jobs[alarm_index] = self.scheduler.add_job(
-                    self.play_radio,
-                    "cron",
-                    hour=self.alarms[alarm_index].time.split(":")[0],
-                    minute=self.alarms[alarm_index].time.split(":")[1],
-                    id=f"alarm_trigger_{alarm_index}",
-                )
+                try:
+                    self.alarm_jobs[alarm_index] = self.scheduler.add_job(
+                        self.play_radio,
+                        "cron",
+                        hour=self.alarms[alarm_index].time.split(":")[0],
+                        minute=self.alarms[alarm_index].time.split(":")[1],
+                        id=f"alarm_trigger_{alarm_index}",
+                    )
+                    print(f"Job added successfully for alarm {alarm_index}")
+                except Exception as e:
+                    print(f"Error adding job for alarm {alarm_index}: {e}")
+            else:
+                print(f"Alarm {alarm_index} is not enabled or time is not set")
+
             print(f"Alarms: {self.alarms}")
             print(f"Alarm jobs: {self.alarm_jobs}")
             return True

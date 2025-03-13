@@ -81,4 +81,4 @@ def set_station():
 
 if __name__ == "__main__":
     # Only used when running directly, not with gunicorn
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8000, debug=True, use_reloader=False)
