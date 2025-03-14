@@ -6,5 +6,6 @@ werkzeug~=2.2.2
 apscheduler~=3.9.1
 gunicorn~=23.0.0
 luma.oled
-RPi.GPIO; sys_platform == 'linux' and platform_machine == 'aarch64'
-spidev; sys_platform == 'linux' and platform_machine == 'aarch64'
+Adafruit-Blinka
+# RPi.GPIO; sys_platform == 'linux' and platform_machine == 'aarch64'
+# spidev; sys_platform == 'linux' and platform_machine == 'aarch64'
