@@ -4,7 +4,9 @@ from pathlib import Path
 import requests
 import vlc
 from apscheduler.schedulers.background import BackgroundScheduler
+from .weather import Weather
 from .projector import Projector
+from .display import Display
 
 
 @dataclass
@@ -46,28 +48,37 @@ class Radio:
         self.scheduler = BackgroundScheduler()
         self.scheduler.start()
 
-        # Initialize 7segment projector controller
-        # Pin assigment: MOSI 19, GND 10, CLOCK 23, CE 24
         self.projector = Projector()
+        self.display = Display()
 
-        # Schedule projector updates every second if not already scheduled
-        if not self.scheduler.get_job("display_update"):
+        if not self.scheduler.get_job("update_displayed_time"):
             self.scheduler.add_job(
-                self._update_display,
+                self._update_time,
                 "interval",
                 seconds=1,
-                id="display_update",
+                id="update_displayed_time",
             )
+
+        if not self.scheduler.get_job("update_weather"):
+            self.scheduler.add_job(
+                self._update_time,
+                "interval",
+                seconds=60,
+                id="update_weather",
+            )
+        self.display.update_weather(Weather.get_weather())
 
         self.init_player()
 
-    def _update_display(self):
-        """Update the display with current status."""
+    def _update_time(self):
         current_time = datetime.now()
         self.projector.send_time(current_time.hour, current_time.minute)
+        self.display.update_time(current_time, self.get_next_alarm())
+
+    def _update_weather(self):
+        self.display.update_weather(Weather.get_weather())
 
     def cleanup(self):
-        """Clean up resources when shutting down."""
         if self.scheduler.running:
             self.scheduler.shutdown()
 

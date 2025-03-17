@@ -5,7 +5,6 @@ python-dotenv~=0.19.0
 werkzeug~=2.2.2
 apscheduler~=3.9.1
 gunicorn~=23.0.0
-luma.oled
-Adafruit-Blinka
-# RPi.GPIO; sys_platform == 'linux' and platform_machine == 'aarch64'
-# spidev; sys_platform == 'linux' and platform_machine == 'aarch64'
+luma.oled~=3.12.0
+luma.core~=2.4.1
+pillow

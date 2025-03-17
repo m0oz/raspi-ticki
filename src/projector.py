@@ -86,7 +86,6 @@ class Projector:
 
     def send_time(self, hours: int, minutes: int):
         """Send the time to the display."""
-        print(f"Sending time: {hours:02d}:{minutes:02d}")
         data = self.create_clock_event(hours, minutes)
         if len(data) != 5:
             raise ValueError("Data must be exactly 5 bytes")
@@ -97,10 +96,6 @@ class Projector:
             # Convert each byte to 8 bits, MSB first
             bits.extend(bool((byte >> i) & 1) for i in range(7, -1, -1))
 
-        # Print bits in groups of 8 for readability
-        bits_str = "".join("1" if bit else "0" for bit in bits)
-        print(bits_str[0] + " " + " ".join(bits_str[i : i + 8] for i in range(1, len(bits), 8)))
-
         self.bitbang_write(bits, num_bits=41)  # Send all 41 bits
 
     def send_binary_event(self, binary_data: str):
@@ -110,8 +105,6 @@ class Projector:
 
         # Convert string of '0' and '1' to list of booleans
         bits = [bool(int(bit)) for bit in binary_data]
-
-        print(f"Sending binary event: {binary_data}")
         self.bitbang_write(bits, num_bits=41)
 
     def replay_from_csv(self, csv_path: str):
