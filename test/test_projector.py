@@ -19,7 +19,6 @@ def test_clock_events():
 
         time_str, _, event_str_binary = line.strip().split(",")
         hour, minute = map(int, time_str.split(":"))
-
         known_events[(hour, minute)] = event_str_binary
 
     # Test all times
@@ -29,39 +28,31 @@ def test_clock_events():
                 continue
 
             generated_event = Projector.create_clock_event(hour, minute)
-            generated = " ".join(bin(byte)[2:].zfill(8) for byte in generated_event)
+            bits = [True]  # Prefix bit
+            for byte in generated_event:
+                bits.extend(bool((byte >> i) & 1) for i in range(7, -1, -1))
+            bits_str = "".join("1" if bit else "0" for bit in bits)
+
             expected = known_events[(hour, minute)]
 
-            assert generated == expected, (
+            assert bits_str == expected, (
                 f"Event mismatch for {hour:02d}:{minute:02d}\n"
                 f"Expected: {expected}\n"
-                f"Got:      {generated}"
+                f"Got:      {bits_str}"
             )
 
 
 def test_the_time():
-    result = Projector.create_clock_event(1, 11)
+    result = Projector.create_clock_event(11, 11)
     assert (
         " ".join(bin(byte)[2:].zfill(8) for byte in result)
-        == "10101100 00110100 00110100 00110100 00000000"
+        == "01011000 01101000 01101000 01101000 11000000"
     )
 
     result = Projector.create_clock_event(0, 0)
     assert (
         " ".join(bin(byte)[2:].zfill(8) for byte in result)
-        == "10101100 01111110 11111110 11111110 10000000"
-    )
-
-    result = Projector.create_clock_event(2, 0)
-    assert (
-        " ".join(bin(byte)[2:].zfill(8) for byte in result)
-        == "10101100 01111110 11111110 11101101 10000000"
-    )
-
-    result = Projector.create_clock_event(21, 31)
-    assert (
-        " ".join(bin(byte)[2:].zfill(8) for byte in result)
-        == "10101100 00110100 01111101 00110100 01000001"
+        == "01011000 11111101 11111101 11111101 00000000"
     )
 
 

@@ -12,8 +12,8 @@ def main():
 
             hour, minute = map(int, user_input.split())
 
-            if not (0 <= hour < 24) or not (0 <= minute < 60):
-                print("Hour must be between 0 and 23, and minute must be between 0 and 59")
+            if not (0 <= hour < 99) or not (0 <= minute < 99):
+                print("Hour must be between 0 and 99, and minute must be between 0 and 99")
                 continue
 
             projector.send_time(hour, minute)

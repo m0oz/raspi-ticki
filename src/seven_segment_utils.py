@@ -59,38 +59,45 @@ class Digit:
 
 
 # Define segment locations for each digit position
+# 1 01011000 11011011 01101000 00000010 11000000 < G
+# 1 01011000 11011011 01101000 00000100 11000000 < F
+# 1 01011000 11011011 01101000 00001000 11000000 < no effect
+# 1 01011000 11011011 01101000 00010000 11000000 < D
+# 1 01011000 11011011 01101000 00100000 11000000 < C
+# 1 01011000 11011011 01101000 01000000 11000000 < B
+# 1 01011000 11011011 01101000 10000000 11000000 < A
 HOUR_ONES = Digit(
     {
-        Segment.A: SegmentLocation(3, 6),
-        Segment.B: SegmentLocation(3, 5),
-        Segment.C: SegmentLocation(3, 4),
-        Segment.D: SegmentLocation(3, 3),
-        Segment.E: SegmentLocation(4, 7),
-        Segment.F: SegmentLocation(3, 1),
-        Segment.G: SegmentLocation(3, 0),
+        Segment.E: SegmentLocation(3, 0),
+        Segment.G: SegmentLocation(3, 1),
+        Segment.F: SegmentLocation(3, 2),
+        Segment.D: SegmentLocation(3, 4),
+        Segment.C: SegmentLocation(3, 5),
+        Segment.B: SegmentLocation(3, 6),
+        Segment.A: SegmentLocation(3, 7),
     }
 )
 
 MINUTE_TENS = Digit(
     {
-        Segment.A: SegmentLocation(2, 6),
-        Segment.B: SegmentLocation(2, 5),
-        Segment.C: SegmentLocation(2, 4),
-        Segment.D: SegmentLocation(2, 3),
-        Segment.E: SegmentLocation(3, 7),
-        Segment.F: SegmentLocation(2, 1),
-        Segment.G: SegmentLocation(2, 0),
+        Segment.E: SegmentLocation(2, 0),
+        Segment.G: SegmentLocation(2, 1),
+        Segment.F: SegmentLocation(2, 2),
+        Segment.D: SegmentLocation(2, 4),
+        Segment.C: SegmentLocation(2, 5),
+        Segment.B: SegmentLocation(2, 6),
+        Segment.A: SegmentLocation(2, 7),
     }
 )
 
 MINUTE_ONES = Digit(
     {
-        Segment.A: SegmentLocation(1, 6),
-        Segment.B: SegmentLocation(1, 5),
-        Segment.C: SegmentLocation(1, 4),
-        Segment.D: SegmentLocation(1, 3),
-        Segment.E: SegmentLocation(2, 7),
-        Segment.F: SegmentLocation(1, 1),
-        Segment.G: SegmentLocation(1, 0),
+        Segment.E: SegmentLocation(1, 0),
+        Segment.G: SegmentLocation(1, 1),
+        Segment.F: SegmentLocation(1, 2),
+        Segment.D: SegmentLocation(1, 4),
+        Segment.C: SegmentLocation(1, 5),
+        Segment.B: SegmentLocation(1, 6),
+        Segment.A: SegmentLocation(1, 7),
     }
 )

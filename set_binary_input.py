@@ -6,12 +6,12 @@ def main():
 
     while True:
         try:
-            user_input = input("Enter 40-bit binary data or 'exit' to quit: ").replace(" ", "")
+            user_input = input("Enter 41-bit binary data or 'exit' to quit: ").replace(" ", "")
             if user_input.lower() == "exit":
                 break
 
-            if len(user_input) != 40 or not all(c in "01" for c in user_input):
-                print("Invalid input. Please enter exactly 40 bits of binary data.")
+            if len(user_input) != 41 or not all(c in "01" for c in user_input):
+                print("Invalid input. Please enter exactly 41 bits of binary data.")
                 continue
 
             projector.send_binary_event(user_input)
